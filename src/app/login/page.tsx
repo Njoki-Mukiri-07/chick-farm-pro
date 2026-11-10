@@ -7,6 +7,7 @@ import Image from 'next/image';
 
 export default function AuthPage() {
   const [isSignUp, setIsSignUp] = useState(false);
+  const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -24,7 +25,13 @@ export default function AuthPage() {
     setSuccessMessage('');
 
     try {
-      if (isSignUp) {
+      if (isForgotPassword) {
+        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+          redirectTo: `${window.location.origin}/login`,
+        });
+        if (error) throw error;
+        setSuccessMessage('Password reset link sent! Please check your email inbox.');
+      } else if (isSignUp) {
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
@@ -35,7 +42,7 @@ export default function AuthPage() {
 
         if (error) throw error;
 
-        // Directly upsert into profiles table to prevent backend trigger crashes
+        // Directly upsert profile to bypass any database trigger errors
         if (data.user) {
           await supabase.from('profiles').upsert({
             id: data.user.id,
@@ -94,10 +101,12 @@ export default function AuthPage() {
           {/* Header Title & Subtitle */}
           <div style={{ marginBottom: '1.75rem' }}>
             <h1 style={{ fontSize: '2rem', fontWeight: 'bold', letterSpacing: '-0.03em', margin: 0, color: '#0f172a' }}>
-              {isSignUp ? 'Create Account' : 'Login'}
+              {isForgotPassword ? 'Reset Password' : (isSignUp ? 'Create Account' : 'Login')}
             </h1>
-            <p style={{ fontSize: '0.9375rem', color: '#64748b', marginTop: '0.375rem', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-              {isSignUp ? 'Set up your enterprise profile below' : 'Hi, Welcome back 👋'}
+            <p style={{ fontSize: '0.9375rem', color: '#64748b', marginTop: '0.375rem' }}>
+              {isForgotPassword 
+                ? 'Enter your email to receive a recovery link' 
+                : (isSignUp ? 'Set up your enterprise profile below' : 'Hi, Welcome back 👋')}
             </p>
           </div>
 
@@ -141,28 +150,30 @@ export default function AuthPage() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="E.g. ****@gmail.com"
+                placeholder="E.g. user@gmail.com"
                 style={{ width: '100%', padding: '0.75rem 1rem', borderRadius: '0.50rem', border: '1px solid #cbd5e1', backgroundColor: '#ffffff', color: '#0f172a', fontSize: '0.9375rem', outline: 'none', boxSizing: 'border-box' }}
               />
             </div>
 
-            <div>
-              <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 600, color: '#334155', marginBottom: '0.375rem' }}>
-                Password
-              </label>
-              <input
-                type="password"
-                required
-                minLength={6}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Enter your password"
-                style={{ width: '100%', padding: '0.75rem 1rem', borderRadius: '0.50rem', border: '1px solid #cbd5e1', backgroundColor: '#ffffff', color: '#0f172a', fontSize: '0.9375rem', outline: 'none', boxSizing: 'border-box' }}
-              />
-            </div>
+            {!isForgotPassword && (
+              <div>
+                <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 600, color: '#334155', marginBottom: '0.375rem' }}>
+                  Password
+                </label>
+                <input
+                  type="password"
+                  required
+                  minLength={6}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Enter your password"
+                  style={{ width: '100%', padding: '0.75rem 1rem', borderRadius: '0.50rem', border: '1px solid #cbd5e1', backgroundColor: '#ffffff', color: '#0f172a', fontSize: '0.9375rem', outline: 'none', boxSizing: 'border-box' }}
+                />
+              </div>
+            )}
 
-            {/* Remember Me & Forgot Password */}
-            {!isSignUp && (
+            {/* Remember Me & Forgot Password toggle */}
+            {!isSignUp && !isForgotPassword && (
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.8125rem' }}>
                 <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', color: '#475569' }}>
                   <input
@@ -173,13 +184,17 @@ export default function AuthPage() {
                   />
                   Remember Me
                 </label>
-                <span style={{ color: '#45543c', fontWeight: 500, cursor: 'pointer' }}>
+                <button
+                  type="button"
+                  onClick={() => { setIsForgotPassword(true); setErrorMessage(''); setSuccessMessage(''); }}
+                  style={{ background: 'none', border: 'none', color: '#45543c', fontWeight: 600, cursor: 'pointer', padding: 0, fontSize: 'inherit' }}
+                >
                   Forgot Password?
-                </span>
+                </button>
               </div>
             )}
 
-            {/* Olive Green Primary Button */}
+            {/* Primary Action Button */}
             <button
               type="submit"
               disabled={loading}
@@ -198,13 +213,24 @@ export default function AuthPage() {
                 transition: 'background-color 0.2s'
               }}
             >
-              {loading ? 'Processing...' : (isSignUp ? 'Create Account' : 'Login')}
+              {loading ? 'Processing...' : (isForgotPassword ? 'Send Reset Link' : (isSignUp ? 'Create Account' : 'Login'))}
             </button>
           </form>
 
-          {/* Tab Toggle Link */}
+          {/* Navigation / Mode Toggle Links */}
           <div style={{ textAlign: 'center', marginTop: '1.75rem', fontSize: '0.875rem', color: '#64748b' }}>
-            {isSignUp ? (
+            {isForgotPassword ? (
+              <span>
+                Remembered your password?{' '}
+                <button
+                  type="button"
+                  onClick={() => { setIsForgotPassword(false); setErrorMessage(''); setSuccessMessage(''); }}
+                  style={{ background: 'none', border: 'none', color: '#45543c', fontWeight: 600, cursor: 'pointer', padding: 0, fontSize: 'inherit' }}
+                >
+                  Sign In
+                </button>
+              </span>
+            ) : isSignUp ? (
               <span>
                 Already have an account?{' '}
                 <button

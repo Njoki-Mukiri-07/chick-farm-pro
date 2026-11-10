@@ -1,10 +1,10 @@
-import type { MetadataRoute } from 'next';
+import type { MetadataRoute } from 'next'
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
     name: 'Chick Farm Pro',
     short_name: 'ChickFarmPro',
-    description: 'Enterprise Poultry Management Platform',
+    description: 'Enterprise Poultry Management System',
     start_url: '/',
     display: 'standalone',
     background_color: '#ffffff',
@@ -12,10 +12,22 @@ export default function manifest(): MetadataRoute.Manifest {
     icons: [
       {
         src: '/chick-farm-pro-app-icon.svg',
-        sizes: '192x192 512x512',
+        sizes: 'any',
         type: 'image/svg+xml',
-        purpose: 'any maskable',
+        purpose: 'any',
+      },
+      {
+        src: '/chick-farm-pro-app-icon.svg',
+        sizes: '192x192',
+        type: 'image/svg+xml',
+        purpose: 'maskable',
+      },
+      {
+        src: '/chick-farm-pro-app-icon.svg',
+        sizes: '512x512',
+        type: 'image/svg+xml',
+        purpose: 'maskable',
       },
     ],
-  };
+  }
 }

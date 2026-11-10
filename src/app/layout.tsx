@@ -15,14 +15,18 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Chick Farm Pro | Poultry Management",
   description: "Track flocks, daily egg logs, feed intake, and net profit.",
+  icons: {
+    icon: [
+      { url: "/chick-farm-pro-app-icon.svg", type: "image/svg+xml" }
+    ],
+    apple: [
+      { url: "/chick-farm-pro-app-icon.svg", type: "image/svg+xml" }
+    ]
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
     title: "Chick Farm Pro",
-  },
-  icons: {
-    icon: "/chick-farm-pro-app-icon.svg",
-    apple: "/chick-farm-pro-app-icon.svg",
   },
 };
 

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
 import SidebarLayout from '@/components/SidebarLayout'
+import InvestmentTracker from '@/components/InvestmentTracker'
 import { 
   Plus, 
   Bird, 
@@ -14,7 +15,8 @@ import {
   ArrowUpRight, 
   ClipboardList, 
   ShoppingBag, 
-  Receipt 
+  Receipt,
+  BarChart3
 } from 'lucide-react'
 
 interface Flock {
@@ -97,23 +99,33 @@ export default function DashboardPage() {
 
   const netProfit = totalSales - totalExpenses
 
+  // Big, readable action cards inspired by FugoSmart
+  const quickActions = [
+    { name: 'Record Activity', href: '/records', icon: ClipboardList, color: 'bg-emerald-50 text-[#45543c] border-emerald-200' },
+    { name: 'Manage Flocks', href: '/flocks', icon: Bird, color: 'bg-amber-50 text-amber-700 border-amber-200' },
+    { name: 'Feed Stock', href: '/finance?tab=feed', icon: Package, color: 'bg-blue-50 text-blue-700 border-blue-200' },
+    { name: 'Record Sales', href: '/sales', icon: ShoppingBag, color: 'bg-purple-50 text-purple-700 border-purple-200' },
+    { name: 'Add Expense', href: '/expenses', icon: Receipt, color: 'bg-rose-50 text-rose-700 border-rose-200' },
+    { name: 'View Reports', href: '/reports', icon: BarChart3, color: 'bg-slate-50 text-slate-700 border-slate-200' },
+  ]
+
   return (
     <SidebarLayout>
       <div className="w-full space-y-6">
-        {/* Hero Header Card */}
-        <div className="relative bg-[#163c29] text-white rounded-3xl p-8 overflow-hidden min-h-[220px] flex flex-col justify-between shadow-sm">
-          {/* Background Image Layer */}
+        
+        {/* Hero Header Banner */}
+        <div className="relative bg-[#45543c] text-white rounded-3xl p-8 overflow-hidden min-h-[200px] flex flex-col justify-between shadow-sm">
           <div 
-            className="absolute inset-0 opacity-20 bg-cover bg-center pointer-events-none"
+            className="absolute inset-0 opacity-15 bg-cover bg-center pointer-events-none"
             style={{ backgroundImage: `url('https://images.unsplash.com/photo-1548550023-2bdb3c5beed7?q=80&w=1200&auto=format&fit=crop')` }}
           />
 
           <div className="relative z-10 space-y-2">
-            <p className="text-[10px] font-bold text-amber-400 uppercase tracking-widest">
+            <p className="text-[10px] font-bold text-amber-300 uppercase tracking-widest">
               {new Date().toLocaleDateString('en-GB', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' })}
             </p>
             <h1 className="text-3xl font-extrabold tracking-tight">{greeting}, Peninah!</h1>
-            <p className="text-xs text-emerald-100/90 font-medium max-w-sm">
+            <p className="text-xs text-emerald-100 font-medium max-w-sm">
               {flocks.length === 0
                 ? 'Add your first batch and your farm numbers will appear here automatically.'
                 : 'Your farm performance metrics are updated with today’s records.'}
@@ -123,44 +135,33 @@ export default function DashboardPage() {
           <div className="relative z-10 mt-6">
             <Link
               href="/records"
-              className="inline-flex items-center gap-2 bg-[#facc15] hover:bg-yellow-400 text-[#163c29] font-extrabold px-5 py-2.5 rounded-full text-xs transition shadow-sm cursor-pointer"
+              className="inline-flex items-center gap-2 bg-[#facc15] hover:bg-yellow-400 text-[#45543c] font-extrabold px-5 py-2.5 rounded-full text-xs transition shadow-sm cursor-pointer"
             >
               <Plus size={16} /> Record today's activity
             </Link>
           </div>
         </div>
 
-        {/* 3 Top Action Buttons */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <Link
-            href="/records"
-            className="bg-white p-4 rounded-2xl border border-gray-100 hover:border-emerald-200 shadow-sm flex items-center gap-3 transition text-left group cursor-pointer"
-          >
-            <div className="p-2.5 bg-gray-100 text-gray-600 rounded-xl group-hover:bg-emerald-50 group-hover:text-emerald-700 transition">
-              <ClipboardList size={18} />
-            </div>
-            <span className="text-xs font-bold text-gray-800">Record activity</span>
-          </Link>
-
-          <Link
-            href="/sales"
-            className="bg-white p-4 rounded-2xl border border-gray-100 hover:border-emerald-200 shadow-sm flex items-center gap-3 transition text-left group cursor-pointer"
-          >
-            <div className="p-2.5 bg-gray-100 text-gray-600 rounded-xl group-hover:bg-emerald-50 group-hover:text-emerald-700 transition">
-              <ShoppingBag size={18} />
-            </div>
-            <span className="text-xs font-bold text-gray-800">Add sale</span>
-          </Link>
-
-          <Link
-            href="/expenses"
-            className="bg-white p-4 rounded-2xl border border-gray-100 hover:border-emerald-200 shadow-sm flex items-center gap-3 transition text-left group cursor-pointer"
-          >
-            <div className="p-2.5 bg-gray-100 text-gray-600 rounded-xl group-hover:bg-emerald-50 group-hover:text-emerald-700 transition">
-              <Receipt size={18} />
-            </div>
-            <span className="text-xs font-bold text-gray-800">Add expense</span>
-          </Link>
+        {/* Large FugoSmart-style Action Buttons */}
+        <div>
+          <h2 className="text-sm font-bold text-gray-900 mb-3 tracking-tight">Quick Actions</h2>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+            {quickActions.map((action) => {
+              const Icon = action.icon
+              return (
+                <Link
+                  key={action.name}
+                  href={action.href}
+                  className={`p-4 rounded-2xl border ${action.color} flex flex-col items-center justify-center text-center transition-all hover:scale-[1.02] shadow-sm cursor-pointer`}
+                >
+                  <div className="p-3 rounded-full bg-white shadow-sm mb-2.5">
+                    <Icon size={24} />
+                  </div>
+                  <span className="font-bold text-xs tracking-tight">{action.name}</span>
+                </Link>
+              )
+            })}
+          </div>
         </div>
 
         {/* 4 Summary Stat Cards */}
@@ -196,7 +197,7 @@ export default function DashboardPage() {
           <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex flex-col justify-between">
             <div className="flex justify-between items-start">
               <span className="text-[10px] font-bold text-gray-400 tracking-wider uppercase">FEED LEFT</span>
-              <div className="p-2 bg-emerald-50 text-emerald-600 rounded-xl">
+              <div className="p-2 bg-emerald-50 text-[#45543c] rounded-xl">
                 <Package size={16} />
               </div>
             </div>
@@ -220,25 +221,14 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Main Grid: Active States & Right Column */}
+        {/* Investment Schedule Tracker */}
+        <InvestmentTracker />
+
+        {/* Flocks & Recent Activity Section */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-6">
-            <div className="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm text-center space-y-3">
-              <div className="w-10 h-10 mx-auto bg-emerald-50 text-emerald-700 rounded-xl flex items-center justify-center">
-                <Bird size={20} />
-              </div>
-              <h3 className="text-sm font-bold text-gray-900">Welcome to Chick Farm Pro</h3>
-              <p className="text-xs text-gray-500 max-w-md mx-auto leading-relaxed">
-                Create your first batch — Broilers, Layers or Improved Kienyeji — then log daily records to build real farm numbers.
-              </p>
-              <Link
-                href="/flocks"
-                className="inline-flex items-center gap-2 bg-[#163c29] hover:bg-emerald-900 text-white font-bold px-4 py-2 rounded-xl text-xs shadow-sm transition mt-1 cursor-pointer"
-              >
-                <Plus size={14} /> Create a batch
-              </Link>
-            </div>
-
+            
+            {/* Active Flocks Overview */}
             <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm space-y-4">
               <div className="flex items-center justify-between">
                 <h3 className="font-bold text-gray-900 text-xs">Your flocks</h3>
@@ -247,7 +237,15 @@ export default function DashboardPage() {
                 </Link>
               </div>
               {flocks.length === 0 ? (
-                <p className="text-xs text-gray-400">No active batches yet.</p>
+                <div className="text-center py-4">
+                  <p className="text-xs text-gray-400 mb-2">No active batches yet.</p>
+                  <Link
+                    href="/flocks"
+                    className="inline-flex items-center gap-1.5 bg-[#45543c] text-white font-bold px-3.5 py-1.5 rounded-xl text-xs cursor-pointer"
+                  >
+                    <Plus size={14} /> Create a batch
+                  </Link>
+                </div>
               ) : (
                 <div className="space-y-2">
                   {flocks.map(f => (
@@ -263,24 +261,7 @@ export default function DashboardPage() {
               )}
             </div>
 
-            <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm space-y-4">
-              <div className="flex items-center justify-between">
-                <h3 className="font-bold text-gray-900 text-xs">Today's activities</h3>
-                <Link href="/records" className="text-xs font-semibold text-gray-400 hover:text-gray-600 cursor-pointer">
-                  All records
-                </Link>
-              </div>
-              <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
-                <div className="w-6 h-6 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center text-xs font-bold">
-                  -
-                </div>
-                <div>
-                  <p className="text-xs font-bold text-gray-800">Feed issued today</p>
-                  <p className="text-[10px] text-gray-400">No feed issued yet</p>
-                </div>
-              </div>
-            </div>
-
+            {/* Sales vs Expenses Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm space-y-3">
                 <div className="flex justify-between items-center">
@@ -320,31 +301,13 @@ export default function DashboardPage() {
                 )}
               </div>
             </div>
+
           </div>
 
+          {/* Right Summary Bar */}
           <div className="space-y-6">
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-              <img 
-                src="https://images.unsplash.com/photo-1516467508483-a7212febe31a?q=80&w=800&auto=format&fit=crop" 
-                alt="Egg basket" 
-                className="w-full h-36 object-cover"
-              />
-              <div className="p-5 space-y-3">
-                <h3 className="font-extrabold text-sm text-gray-900">Keep going!</h3>
-                <p className="text-xs text-gray-500 leading-relaxed">
-                  Set up your first batch to start seeing farm performance here.
-                </p>
-                <Link 
-                  href="/reports"
-                  className="text-xs font-bold text-gray-800 hover:text-emerald-700 flex items-center gap-1 transition cursor-pointer"
-                >
-                  View reports <ArrowUpRight size={14} />
-                </Link>
-              </div>
-            </div>
-
             <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm space-y-4">
-              <h4 className="font-bold text-xs text-gray-900">This month</h4>
+              <h4 className="font-bold text-xs text-gray-900">This month overview</h4>
               <div className="space-y-2 text-xs">
                 <div className="flex justify-between text-gray-500">
                   <span>Sales</span>
@@ -368,6 +331,7 @@ export default function DashboardPage() {
             </div>
           </div>
         </div>
+
       </div>
     </SidebarLayout>
   )

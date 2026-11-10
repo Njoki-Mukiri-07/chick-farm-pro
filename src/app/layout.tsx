@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -21,6 +21,18 @@ export const metadata: Metadata = {
     statusBarStyle: "black-translucent",
     title: "Chick Farm Pro",
   },
+  icons: {
+    icon: "/chick-farm-pro-app-icon.svg",
+    apple: "/chick-farm-pro-app-icon.svg",
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#45543c",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
 };
 
 export default function RootLayout({

@@ -35,6 +35,15 @@ export default function AuthPage() {
 
         if (error) throw error;
 
+        // Directly upsert into profiles table to prevent backend trigger crashes
+        if (data.user) {
+          await supabase.from('profiles').upsert({
+            id: data.user.id,
+            full_name: fullName,
+            email: email,
+          });
+        }
+
         if (data.user && data.session === null) {
           setSuccessMessage('Registration successful! Please check your email to confirm.');
         } else {

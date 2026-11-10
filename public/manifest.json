@@ -1,0 +1,21 @@
+{
+  "name": "Chick Farm Pro",
+  "short_name": "ChickFarmPro",
+  "description": "Poultry Management & Profit Tracking System",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1e3f20",
+  "theme_color": "#1e3f20",
+  "icons": [
+    {
+      "src": "https://em-content.zobj.net/source/microsoft-teams/337/chicken_1f414.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://em-content.zobj.net/source/microsoft-teams/337/chicken_1f414.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
